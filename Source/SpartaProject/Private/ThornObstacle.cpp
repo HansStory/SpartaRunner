@@ -35,9 +35,9 @@ void AThornObstacle::ShowThorn()
 	ProgressFunction.BindUFunction(this, FName("HandleTimelineProgress"));
 	TweenTimeline.AddInterpFloat(TweenCurve, ProgressFunction);
 
-	FOnTimelineEvent FinishFunction;
-	FinishFunction.BindUFunction(this, FName("OnTimelineFinished"));
-	TweenTimeline.SetTimelineFinishedFunc(FinishFunction);
+	FOnTimelineEvent OnFinished;
+	OnFinished.BindUFunction(this, FName("OnTimelineFinished"));
+	TweenTimeline.SetTimelineFinishedFunc(OnFinished);
 
 	// 2초 동안 애니메이션 실행
 	TweenTimeline.SetLooping(false);
