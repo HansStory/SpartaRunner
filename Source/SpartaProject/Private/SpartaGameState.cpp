@@ -27,7 +27,7 @@ void ASpartaGameState::BeginPlay()
 		HUDUpdateTimerHandle,
 		this,
 		&ASpartaGameState::UpdateHUD,
-		0.1f,
+		0.01f,
 		true
 	);
 }
@@ -181,7 +181,7 @@ void ASpartaGameState::UpdateHUD()
 				if (UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Time"))))
 				{
 					float RemainingTime = GetWorldTimerManager().GetTimerRemaining(LevelTimerHandle);
-					TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time : %.1f"), RemainingTime)));
+					TimeText->SetText(FText::FromString(FString::Printf(TEXT("%.2f"), RemainingTime)));
 				}
 
 				if (UTextBlock* ScoreText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Score"))))
@@ -196,9 +196,9 @@ void ASpartaGameState::UpdateHUD()
 					}
 				}
 
-				if (UTextBlock* LevelText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Level"))))
+				if (UTextBlock* LevelText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Wave"))))
 				{
-					LevelText->SetText(FText::FromString(FString::Printf(TEXT("Level : %d"), CurrentLevelIndex + 1)));
+					LevelText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentLevelIndex + 1, MaxLevels)));
 				}
 			}
 		}
