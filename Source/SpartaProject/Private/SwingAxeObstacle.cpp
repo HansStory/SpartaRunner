@@ -6,6 +6,15 @@ ASwingAxeObstacle::ASwingAxeObstacle()
 
 	ObstacleType = "SwingAxeObstacle";
 	SwingDuration = 2.0f;
+
+	EmptyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EmptyMesh"));
+	EmptyMesh->SetupAttachment(Scene);
+
+	Collision->SetupAttachment(EmptyMesh);
+	StaticMesh->SetupAttachment(Collision);
+
+	StartRotate = FRotator(0, 0, -90);
+	EndRotate = FRotator(0, 0, 90);
 }
 
 void ASwingAxeObstacle::BeginPlay()
@@ -43,8 +52,8 @@ void ASwingAxeObstacle::StartTweenAnimation()
 
 void ASwingAxeObstacle::HandleTimelineProgress(float Value)
 {
-	FRotator NewRotation = FMath::Lerp(FRotator(0, 0, -90), FRotator(0, 0, 90), Value);
-	Collision->SetRelativeRotation(NewRotation);
+	FRotator NewRotation = FMath::Lerp(StartRotate, EndRotate, Value);
+	EmptyMesh->SetRelativeRotation(NewRotation);
 }
 
 void ASwingAxeObstacle::OnTimelineFinished()

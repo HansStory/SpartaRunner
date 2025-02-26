@@ -16,6 +16,9 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Obstacle|Component")
+	UStaticMeshComponent* EmptyMesh;
+
 	UPROPERTY()
 	FTimeline TweenTimeline;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle|Component")
@@ -29,4 +32,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle")
 	float SwingDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle|SwingAxe")
+	FRotator StartRotate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Obstacle|SwingAxe")
+	FRotator EndRotate;
 };
