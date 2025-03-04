@@ -38,7 +38,7 @@ void AObstacle::OnObstacleOverlap(
 {
 	if (OtherActor && OtherActor->ActorHasTag("Player"))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Overlap!!")));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Overlap!!")));
 		ActivateObstacle(OtherActor);
 	}
 }
@@ -103,11 +103,11 @@ void AObstacle::ActivateObstacle(AActor* Activator)
 		);
 
 		// LOG
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			2.0f,
-			FColor::Green,
-			FString::Printf(TEXT("Player damaged %f by Obstacle!!"), Damage));
+		//GEngine->AddOnScreenDebugMessage(
+		//	-1,
+		//	2.0f,
+		//	FColor::Green,
+		//	FString::Printf(TEXT("Player damaged %f by Obstacle!!"), Damage));
 
 
 		// 사운드 출력
