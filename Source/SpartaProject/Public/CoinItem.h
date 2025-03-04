@@ -15,8 +15,19 @@ public:
 	ACoinItem();
 
 protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int32 PointValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Coin")
+	float SpinSpeed;
+
+	FVector OriginalSpawnLocation;
 	
 	virtual void ActivateItem(AActor* Activator) override;
+
+private:
+	void UpdateSpin(float DeltaTime);
 };

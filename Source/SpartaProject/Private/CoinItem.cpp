@@ -4,8 +4,25 @@
 
 ACoinItem::ACoinItem()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	PointValue = 0;
+	SpinSpeed = 180.0f;
 	ItemType = "DefaultCoin";
+}
+
+void ACoinItem::BeginPlay()
+{
+	Super::BeginPlay();
+
+	OriginalSpawnLocation = GetActorLocation();
+}
+
+void ACoinItem::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UpdateSpin(DeltaTime);
 }
 
 void ACoinItem::ActivateItem(AActor* Activator)
@@ -23,12 +40,11 @@ void ACoinItem::ActivateItem(AActor* Activator)
 			}
 		}
 
-		// LOG
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			2.0f,
-			FColor::Green,
-			FString::Printf(TEXT("Player Gained %d Points!!"), PointValue));
 		DestroyItem();
 	}
+}
+
+void ACoinItem::UpdateSpin(float DeltaTime)
+{
+	AddActorLocalRotation(FRotator(0.f, SpinSpeed * DeltaTime, 0.f));
 }

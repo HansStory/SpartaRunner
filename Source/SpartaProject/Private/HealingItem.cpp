@@ -17,13 +17,6 @@ void AHealingItem::ActivateItem(AActor* Activator)
 		{
 			PlayerCharacter->AddHealth(HealAmount);
 		}
-
-		//Log
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			2.0f,
-			FColor::Green,
-			FString::Printf(TEXT("Player Gained %d HP"), HealAmount));
 		
 		DestroyItem();
 	}
