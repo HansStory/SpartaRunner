@@ -9,3 +9,4 @@ ASpartaGameMode::ASpartaGameMode()
 	PlayerControllerClass = ASpartaPlayerController::StaticClass();
 	GameStateClass = ASpartaGameState::StaticClass();
 }
+

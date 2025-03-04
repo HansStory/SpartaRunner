@@ -15,7 +15,9 @@ ASpartaPlayerController::ASpartaPlayerController()
 	HUDWidgetClass(nullptr),
 	HUDWidgetInstance(nullptr),
 	MainMenuWidgetClass(nullptr),
-	MainMenuWidgetInstance(nullptr)
+	MainMenuWidgetInstance(nullptr),
+	GameEndWidgetClass(nullptr),
+	GameEndWidgetInstance(nullptr)
 {
 }
 
@@ -35,15 +37,6 @@ void ASpartaPlayerController::BeginPlay()
 		}
 	}
 
-	//if (HUDWidgetClass)
-	//{
-	//	HUDWidgetInstance = CreateWidget<UUserWidget>(this, HUDWidgetClass);
-	//	if (HUDWidgetInstance)
-	//	{
-	//		HUDWidgetInstance->AddToViewport();
-	//	}
-	//}
-
 	ASpartaGameState* SpartaGameState = GetWorld() ? GetWorld()->GetGameState<ASpartaGameState>() : nullptr;
 	if (SpartaGameState)
 	{
@@ -53,7 +46,7 @@ void ASpartaPlayerController::BeginPlay()
 	FString CurrentMapName = GetWorld()->GetMapName();
 	if (CurrentMapName.Contains("MenuLevel"))
 	{
-		ShowMainMenu(false);
+		ShowMainMenu();
 	}
 }
 
@@ -62,7 +55,7 @@ UUserWidget* ASpartaPlayerController::GetHUDWidget() const
 	return HUDWidgetInstance;
 }
 
-void ASpartaPlayerController::ShowMainMenu(bool bIsRestart)
+void ASpartaPlayerController::ShowMainMenu()
 {
 	if (HUDWidgetInstance)
 	{
@@ -76,6 +69,12 @@ void ASpartaPlayerController::ShowMainMenu(bool bIsRestart)
 		MainMenuWidgetInstance = nullptr;
 	}
 
+	if (GameEndWidgetInstance)
+	{
+		GameEndWidgetInstance->RemoveFromParent();
+		GameEndWidgetInstance = nullptr;
+	}
+
 	if (MainMenuWidgetClass)
 	{
 		MainMenuWidgetInstance = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
@@ -85,38 +84,6 @@ void ASpartaPlayerController::ShowMainMenu(bool bIsRestart)
 
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
-		}
-
-		if (UTextBlock* ButtonText = Cast<UTextBlock>(MainMenuWidgetInstance->GetWidgetFromName(TEXT("StartButtonText"))))
-		{
-			if (bIsRestart)
-			{
-				ButtonText->SetText(FText::FromString(TEXT("Restart")));
-			}
-			else
-			{
-				ButtonText->SetText(FText::FromString(TEXT("Start")));
-			}
-
-			if (bIsRestart)
-			{
-				UFunction* PlayAnimFunc = MainMenuWidgetInstance->FindFunction(FName("PlayGameOverAnim"));
-				if (PlayAnimFunc)
-				{
-					MainMenuWidgetInstance->ProcessEvent(PlayAnimFunc, nullptr);
-				}
-
-				if (UTextBlock* TotalScoreText = Cast<UTextBlock>(MainMenuWidgetInstance->GetWidgetFromName("TotalScoreText")))
-				{
-					if (USpartaGameInstance* SpartaGameInstance = Cast<USpartaGameInstance>(UGameplayStatics::GetGameInstance(this)))
-					{
-						TotalScoreText->SetText(FText::FromString(
-
-							FString::Printf(TEXT("Total Score: %d"), SpartaGameInstance->TotalScore)
-						));
-					}
-				}
-			}
 		}
 	}
 }
@@ -135,6 +102,12 @@ void ASpartaPlayerController::ShowGameHUD()
 		MainMenuWidgetInstance = nullptr;
 	}
 
+	if (GameEndWidgetInstance)
+	{
+		GameEndWidgetInstance->RemoveFromParent();
+		GameEndWidgetInstance = nullptr;
+	}
+
 	if (HUDWidgetClass)
 	{
 		HUDWidgetInstance = CreateWidget<UUserWidget>(this, HUDWidgetClass);
@@ -150,7 +123,88 @@ void ASpartaPlayerController::ShowGameHUD()
 		if (SpartaGameState)
 		{
 			SpartaGameState->UpdateHUD();
+			SpartaGameState->UpdateScoreHUD();
+			SpartaGameState->UpdateWaveHUD();
 		}
+
+		UFunction* PlayAnimFunc = HUDWidgetInstance->FindFunction(FName("AnimTimer"));
+		if (PlayAnimFunc)
+		{
+			HUDWidgetInstance->ProcessEvent(PlayAnimFunc, nullptr);
+		}
+	}
+}
+
+void ASpartaPlayerController::ShowGameEndMenu(bool isClear)
+{
+	if (HUDWidgetInstance)
+	{
+		HUDWidgetInstance->RemoveFromParent();
+		HUDWidgetInstance = nullptr;
+	}
+
+	if (MainMenuWidgetInstance)
+	{
+		MainMenuWidgetInstance->RemoveFromParent();
+		MainMenuWidgetInstance = nullptr;
+	}
+
+	if (GameEndWidgetInstance)
+	{
+		GameEndWidgetInstance->RemoveFromParent();
+		GameEndWidgetInstance = nullptr;
+	}
+
+	GameEndWidgetInstance = CreateWidget<UUserWidget>(this, GameEndWidgetClass);
+	if (GameEndWidgetInstance)
+	{
+		GameEndWidgetInstance->AddToViewport();
+
+		bShowMouseCursor = true;
+		SetInputMode(FInputModeUIOnly());
+	}
+
+	if (UTextBlock* PlayTimeText = Cast<UTextBlock>(GameEndWidgetInstance->GetWidgetFromName("PlayTimeText")))
+	{
+		ASpartaGameState* SpartaGameState = GetWorld() ? GetWorld()->GetGameState<ASpartaGameState>() : nullptr;
+		if (SpartaGameState)
+		{
+			float playTime = SpartaGameState->PlayTime;
+			int32 Minutes = static_cast<int32>(playTime) / 60;
+			int32 Seconds = static_cast<int32>(playTime) % 60;
+			int32 Milliseconds = static_cast<int32>((playTime - static_cast<int32>(playTime)) * 100);
+
+			PlayTimeText->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d:%02d"), Minutes, Seconds, Milliseconds)));
+		}
+	}
+
+	if (UTextBlock* TotalScoreText = Cast<UTextBlock>(GameEndWidgetInstance->GetWidgetFromName("TotalScoreText")))
+	{
+		if (USpartaGameInstance* SpartaGameInstance = Cast<USpartaGameInstance>(UGameplayStatics::GetGameInstance(this)))
+		{
+			TotalScoreText->SetText(FText::FromString(
+				FString::Printf(TEXT("%d"), SpartaGameInstance->TotalScore)
+			));
+		}
+	}
+
+	if (UTextBlock* GameOverText = Cast<UTextBlock>(GameEndWidgetInstance->GetWidgetFromName("TextGameOver")))
+	{
+		if (isClear)
+		{
+			GameOverText->SetText(FText::FromString(FString::Printf(TEXT("Clear Game!!"))));
+		}
+		else
+		{
+			GameOverText->SetText(FText::FromString(FString::Printf(TEXT("Game Over"))));
+		}
+
+		UFunction* PlayAnimFunc = GameEndWidgetInstance->FindFunction(FName("PlayGameOverAnim"));
+		if (PlayAnimFunc)
+		{
+			GameEndWidgetInstance->ProcessEvent(PlayAnimFunc, nullptr);
+		}
+
 	}
 }
 
@@ -162,6 +216,6 @@ void ASpartaPlayerController::StartGame()
 		SpartaGameInstance->TotalScore = 0;
 	}
 
-	UGameplayStatics::OpenLevel(GetWorld(), FName("BasicLevel"));
+	UGameplayStatics::OpenLevel(GetWorld(), FName("NumericLevel"));
 	SetPause(false);
 }

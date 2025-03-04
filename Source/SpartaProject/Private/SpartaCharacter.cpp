@@ -21,13 +21,12 @@ ASpartaCharacter::ASpartaCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
 
-	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
-	OverheadWidget->SetupAttachment(GetMesh());
-	OverheadWidget->SetWidgetSpace(EWidgetSpace::Screen);
-
+	//OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	//OverheadWidget->SetupAttachment(GetMesh());
+	//OverheadWidget->SetWidgetSpace(EWidgetSpace::Screen);
 
 	NormalSpeed = 600.0f;
-	SprintSpeedMultiplier = 1.7f;
+	SprintSpeedMultiplier = 2.f;
 	SprintSpeed = NormalSpeed * SprintSpeedMultiplier;
 
 	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
@@ -45,7 +44,12 @@ void ASpartaCharacter::AddHealth(float Amount)
 {
 	Health = FMath::Clamp(Health + Amount, 0.0f, MaxHealth);
 	UE_LOG(LogTemp, Warning, TEXT("Health increased to: %f"), Health);
-	UpdateOverheadHP();
+
+	if (ASpartaGameState* GameSate = Cast<ASpartaGameState>(GetWorld()->GetGameState()))
+	{
+		GameSate->UpdateCharacterHP(Health, MaxHealth);
+	}
+	//UpdateOverheadHP();
 }
 
 
@@ -59,7 +63,12 @@ float ASpartaCharacter::TakeDamage(
 
 	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
 	UE_LOG(LogTemp, Warning, TEXT("Health decreased to: %f"), Health);
-	UpdateOverheadHP();
+	//UpdateOverheadHP();
+
+	if (ASpartaGameState* GameSate = Cast<ASpartaGameState>(GetWorld()->GetGameState()))
+	{
+		GameSate->UpdateCharacterHP(Health, MaxHealth);
+	}
 
 	if (Health <= 0.0f)
 	{
@@ -73,7 +82,11 @@ float ASpartaCharacter::TakeDamage(
 void ASpartaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UpdateOverheadHP();
+	if (ASpartaGameState* GameSate = Cast<ASpartaGameState>(GetWorld()->GetGameState()))
+	{
+		GameSate->UpdateCharacterHP(Health, MaxHealth);
+	}
+	//UpdateOverheadHP();
 }
 
 void ASpartaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -203,15 +216,15 @@ void ASpartaCharacter::OnDeath()
 
 void ASpartaCharacter::UpdateOverheadHP()
 {
-	if (!OverheadWidget) return;
+	//if (!OverheadWidget) return;
 
-	UUserWidget* OverheadWidgetInstance = OverheadWidget->GetUserWidgetObject();
-	if (!OverheadWidgetInstance) return;
+	//UUserWidget* OverheadWidgetInstance = OverheadWidget->GetUserWidgetObject();
+	//if (!OverheadWidgetInstance) return;
 
-	if (UTextBlock* HPText = Cast<UTextBlock>(OverheadWidgetInstance->GetWidgetFromName(TEXT("OverHeadHP"))))
-	{
-		HPText->SetText(FText::FromString(FString::Printf(TEXT("%.0f / %.0f"), Health, MaxHealth)));
-	}
+	//if (UTextBlock* HPText = Cast<UTextBlock>(OverheadWidgetInstance->GetWidgetFromName(TEXT("OverHeadHP"))))
+	//{
+	//	HPText->SetText(FText::FromString(FString::Printf(TEXT("%.0f / %.0f"), Health, MaxHealth)));
+	//}
 
 }
 

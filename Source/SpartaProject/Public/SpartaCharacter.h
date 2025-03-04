@@ -22,8 +22,8 @@ public:
 	USpringArmComponent* SpringArmComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComp;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	UWidgetComponent* OverheadWidget;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	//UWidgetComponent* OverheadWidget;
 
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetHealth() const;
@@ -63,9 +63,11 @@ protected:
 	void OnDeath();
 	void UpdateOverheadHP();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+	float NormalSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+	float SprintSpeedMultiplier;
 
 private:
-	float NormalSpeed;
-	float SprintSpeedMultiplier;
 	float SprintSpeed;
 };

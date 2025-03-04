@@ -27,6 +27,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
 	int32 MaxLevels;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wave")
+	int32 CurrentWaveIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave")
+	int32 MaxWaves;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Level")
 	TArray<FName> LevelMapNames;
 
@@ -39,13 +44,37 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	void AddScore(int32 Amount);
 	UFUNCTION(BlueprintCallable, Category = "Level")
-	void OnGameOver();
-	
-	
+	void OnGameOver(bool isClear = false);
+		
 	void StartLevel();
-	void OnLevelTimeUp();
+	//void OnLevelTimeUp();
 	void OnCoinCollected();
 	void EndLevel();
+
+	void ClearWave();
+
+	void StartWave(int index);
+	void DisplayWaveQuizHUD(int index);
+	void SpawnItem(int index);
+
+	void EndWave();
+
+	void UpdateGameState();
 	void UpdateHUD();
 
+	void UpdateScoreHUD();
+	void UpdateWaveHUD();
+	void UpdateCharacterHP(float CurrentHP, float MaxHP);
+
+	UUserWidget* GetHudWidget();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave")
+	float WaveRemainTime;
+	float PlayTime;
+
+	TArray<AActor*> ItemSpawnVolumes;
+	
+private:
+	float UpdateRepeatRate;
+	float MaxLevelLength;
 };
